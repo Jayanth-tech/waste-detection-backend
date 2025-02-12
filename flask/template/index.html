@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waste Detection AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .shadow-inner-bottom {
+          box-shadow: inset 0px -4px 6px rgba(0, 0, 0, 0.1);
+        }
+        /* Added specific styling for preview container */
+        .preview-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 400px;
+            background: #1f2937;
+        }
+       
+        .preview-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+       
+    </style>
+        <!-- <script src="static/js/main.js"></script> -->
+ 
+</head>
+<body class="min-h-screen bg-gray-900">
+   
+ 
+    <!-- Main Container -->
+    <div class="relative z-10">
+        <!-- Header Section -->
+        <header class="w-full bg-gradient-to-r from-blue-200 via-gray-300 to-blue-200 shadow-lg">
+            <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+                <!-- Logo and Title -->
+                <div class="flex items-center space-x-80">
+                    <img src="/static/images/ailogo.png" alt="AI Logo" class="w-40 h-20 rounded-md object-contain"/>
+                    <div>
+                        <h1 class="text-2xl md:text-3xl lg:text-3xl font-bold text-black">AI for Waste Detection</h1>
+                        <p class="text-black/80 text-sm md:text-base ">Intelligent Falling Waste Detection System</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+ 
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 py-8">
+            <div class="max-w-6xl mx-auto bg-gray-600/85 backdrop-blur-sm rounded-2xl shadow-2xl overflow-hidden">
+                <div class="p-6 lg:p-8">
+                    <!-- Grid Layout -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Left Side - Controls -->
+                        <div class="flex flex-col space-y-6">
+                            <!-- Upload Section -->
+                            <div class="bg-gray-700 rounded-xl p-6 border-2 border-dashed border-gray-600 hover:border-blue-100 transition-colors">
+                                <div class="flex flex-col items-center">
+                                    <div class="w-20 h-20 flex items-center justify-center rounded-full bg-gray-900/50 mb-4">
+                                        <svg class="w-10 h-10 text-blue-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                                        </svg>
+                                    </div>
+                                    <h3 class="text-xl font-semibold text-white mb-2">Upload Video</h3>
+                                    <p class="text-gray-300 text-center mb-4">Select or drag & drop your video file here</p>
+ 
+                                    <button onclick="document.getElementById('file-input').click()"
+                                            class="bg-gradient-to-r from-blue-200 to-gray-200 text-black font-medium px-6 py-3 rounded-lg hover:from-gray-400 hover:to-blue-400 transition-colors focus:ring-2 focus:ring-blue-100 focus:ring-offset-2">
+                                        Select Video File
+                                    </button>
+                                   
+                                    <input type="file" id="file-input" accept="video/*" class="hidden"/>
+                                    <p id="selected-file" class="text-sm text-gray-400 mt-4"></p>
+                                    <p class="text-gray-300 text-center mb-10">Limit 200MB per file • MP4, AVI, MOV, MPEG4</p>
+                                </div>
+                            </div>
+ 
+                            <!-- Controls -->
+                            <div class="space-y-4">
+                                <button id="start-detection" disabled
+                                        class="w-full bg-gradient-to-r from-blue-200 to-gray-200 text-black font-semibold py-4 px-6 rounded-lg hover:from-gray-400 hover:to-blue-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-blue-100 focus:ring-offset-2">
+                                    Start Detection
+                                </button>
+ 
+                                <!-- Progress Bar -->
+                                <div id="progress-container" class="hidden space-y-2">
+                                    <div class="w-full bg-gray-700 rounded-full h-3">
+                                        <div id="progress-bar" class="bg-gradient-to-r from-blue-200 to-gray-200 h-3 rounded-full transition-all" style="width: 0%"></div>
+                                    </div>
+                                    <p id="progress-text" class="text-sm text-gray-300 text-center">Processing: 0%</p>
+                                </div>
+                            </div>
+                        </div>
+ 
+                        <!-- Right Side - Preview -->
+                        <div class="bg-gray-700 rounded-xl border-4 border-gray-600 p-2 overflow-hidden">
+                            <div class="preview-container">
+                                <div id="video-preview" class="preview-content hidden">
+                                    <video id="preview-player" class="w-full h-full object-contain"></video>
+                                    <canvas id="preview-canvas" class="w-full h-full object-contain absolute top-0 left-0"></canvas>
+                                </div>
+                                <div id="preview-placeholder" class="preview-content">
+                                    <img src="/static/images/preview1.png" alt="Video Preview" class="w-full h-full object-contain"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+ 
+                    <!-- Results Section -->
+                    <div id="results-section" class="hidden mt-8">
+                        <button id="download-results"
+                                class="mx-auto block bg-gradient-to-r from-blue-200 to-gray-200 text-black font-semibold py-3 px-8 rounded-lg hover:from-gray-400 hover:to-blue-400 transition-all focus:ring-2 focus:ring-blue-100 focus:ring-offset-2">
+                            Download Results
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+ 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('file-input');
+            const selectedFile = document.getElementById('selected-file');
+            const startDetection = document.getElementById('start-detection');
+            const previewPlayer = document.getElementById('preview-player');
+            const videoPreview = document.getElementById('video-preview');
+            const previewPlaceholder = document.getElementById('preview-placeholder');
+           
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    selectedFile.textContent = `Selected: ${file.name}`;
+                    startDetection.disabled = false;
+                   
+                    // Create object URL for video preview
+                    const objectUrl = URL.createObjectURL(file);
+                    previewPlayer.src = objectUrl;
+                   
+                    // Show video preview and hide placeholder
+                    videoPreview.classList.remove('hidden');
+                    previewPlaceholder.classList.add('hidden');
+                   
+                    // Set up video player
+                    previewPlayer.classList.remove('hidden');
+                    previewPlayer.controls = true;
+                   
+                    // Clean up object URL when video is loaded
+                    previewPlayer.onloadedmetadata = function() {
+                        URL.revokeObjectURL(objectUrl);
+                    };
+                }
+            });
+        });
+    </script>
+    <!-- <script src="main.js"></script> -->
+    <style>
+        @keyframes fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slide-up {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-fade-in { animation: fade-in 0.6s ease-out; }
+        .animate-slide-up { animation: slide-up 0.8s ease-out; }
+ 
+        @media (max-width: 768px) {
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+        }
+ 
+        button:focus, input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.2);
+        }
+    </style>
+    <script src="/flask/static/js/main.js"></script>
+ 
+</body>
+</html>
